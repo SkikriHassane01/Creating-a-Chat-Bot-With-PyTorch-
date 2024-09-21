@@ -531,6 +531,14 @@
         "responses": [
           "The Handwritten digit image classification with AWS deployment project involves creating a machine learning model to classify handwritten digits and deploying it on AWS. This project demonstrates my skills in machine learning, computer vision, and cloud deployment. You can explore the project at https://github.com/SkikriHassane01/Handwritten-digit-image-classification-with-aws-deployment"
         ]
+      },
+      {"tag": "goodbye",
+        "patterns": ["Bye", "See you later", "Goodbye"],
+        "responses": ["See you later, thanks for visiting", "Have a nice day", "Bye! Come back again soon."]
+      },
+      {"tag": "thanks",
+        "patterns": ["Thanks", "Thank you", "That's helpful"],
+        "responses": ["Happy to help!", "Any time!", "My pleasure"]
       }
     ]
   }
