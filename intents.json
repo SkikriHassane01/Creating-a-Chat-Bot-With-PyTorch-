@@ -90,7 +90,7 @@
       {
         "tag": "linkedIn",
         "patterns": [
-          "What's your LinkedIn profile?",
+          "What's your LinkedIn profile?"
         ],
         "responses": [
           "My LinkedIn profile can be found at https://www.linkedin.com/in/hassane-skikri-8b25b9308/."
