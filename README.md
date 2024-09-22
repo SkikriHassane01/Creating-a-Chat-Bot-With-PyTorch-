@@ -34,4 +34,56 @@ Each conversational contains:
 - **Patterns:** sentence patterns for our neural network text classifier
 - **responses:** one will be used as a response
 
+## Terminology and step by step to create this project
+
+1. **Tokenization**
+   - Input: "Is anyone there?"
+   - Output: `["Is", "anyone", "there", "?"]`
+
+2. **Lowercasing and Stemming**
+   - Process the tokens by converting to lowercase and then applying stemming (if necessary).
+   - Output remains: `["is", "anyone", "there", "?"]`
+
+3. **Removing Punctuation Characters**
+   - Exclude punctuation from tokens.
+   - Output: `["is", "anyone", "there"]`
+
+4. **Bag of Words**
+   - Convert the tokens into a numerical format known as a bag of words.
+   - Output Vector: `[0, 0, 0, 1, 0, 1, 0, 1]`
+
+### 1. Create the utils.py
+
+- Create the tokenize function
+
+```python
+tokenize function split sentence into array of words/tokens
+a token can be a word or punctuation character, or number
+```
+
+- Create the stem function
+
+```python
+stemming = find the root form of the word
+    examples:
+    words = ["organize", "organizes", "organizing"]
+    words = [stem(w) for w in words]
+    -> ["organ", "organ", "organ"]
+```
+
+- create the bag_of_words function
+
+```python
+return bag of words array:
+    1 for each known word that exists in the sentence, 0 otherwise
+    example:
+    sentence = ["hello", "how", "are", "you"]
+    words = ["hi", "hello", "I", "you", "bye", "thank", "cool"]
+    bag   = [  0 ,    1 ,    0 ,   1 ,    0 ,    0 ,      0]
+```
+
+our model will work like this
+
+![alt text](image.png)
+
 So let's go and build our own chatbot from scratch
