@@ -87,3 +87,12 @@ our model will work like this
 ![alt text](image.png)
 
 So let's go and build our own chatbot from scratch
+
+### Release 2
+
+after noting that our chatbot is very week and he can handle just a few question we will add some pre trained model and also adding the Azure openAI API for a dynamic response.
+
+so we will integrate both **Azure OpenAI API** and my **Custom Intent-based system**
+
+1. **To Handle Static Intents:** we will use custom `intents.json` file for predefined responses when intent is clear.
+2. **To handle Dynamic Response:** when the chatbot cannot confidently identify an intent, it will send the user's query to the Azure OpenAi API for a dynamic response.
