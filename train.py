@@ -1,101 +1,43 @@
-import json
-from utils import tokenize, stem, bag_of_words
-import numpy as np
-import torch 
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-from model import NeuralNet
-with open ('intents.json', 'r') as f:
-    intents = json.load(f)
-    
-all_words = []
-tags= []
-xy = [] # this will hold both the patterns and the corresponding tag
+import torch
+from torch.utils.data import DataLoader
+from torch.optim import AdamW
+from dataset import IntentDataset, load_data
+from utils import encode_labels, split_data
+from model import load_model
 
-for intent in intents['intents']:
-    tag = intent['tag']
-    tags.append(tag)
-    
-    for pattern in intent['patterns']:
-        words = tokenize(pattern)
-        all_words.extend(words) #we use extent because w is an array and we don't want the all_words to be an array or arrays
-        xy.append((words, tag))
-        
-ignore_words = ['?', '!', '.', ',', '$', '*']
-all_words = [stem(word) for word in all_words if word not in ignore_words]
-all_words = sorted(set(all_words))
-tags = sorted(set(tags))
+# load the data 
+patterns, tags, intents = load_data('./Data/intents.json')
+labels, label_encoder = encode_labels(tags)
 
-X_train = []
-y_train = []
+# split data
+X_train, X_test, y_train, y_test = split_data(patterns, labels)
 
-for (pattern_sentence, tag) in xy:
-    bag = bag_of_words(pattern_sentence, all_words)
-    X_train.append(bag)
-    label = tags.index(tag)
-    y_train.append(label) 
-    
-X_train = np.array(X_train)
-y_train = np.array(y_train)
+# load model and tokenizer
+num_labels = len(set(labels))
+tokenizer, model, device = load_model(num_labels)
 
-class ChatDataset(Dataset):
-    def __init__(self):
-        self.n_samples = len(X_train)
-        self.x_data = X_train
-        self.y_data = y_train
-    
-    # access dataset[idx]
-    def __getitem__(self, index):
-        return self.x_data[index], self.y_data[index]
-    # access len(dataset)
-    def __len__(self):
-        return self.n_samples
+# prepare datasets and dataloaders 
+train_dataset = IntentDataset(X_train, y_train, tokenizer)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 
-# hyperparameters 
-batch_size = 8
-hidden_size = 8
-output_size = len(tags)
-input_size = len(X_train[0])
-learning_rate = 0.001
-num_epochs = 1700
+# optimizer and loss function
+optimizer = AdamW(model.parameters(), lr=5e-5)
+criterion = torch.nn.CrossEntropyLoss()
 
-dataset = ChatDataset()
-train_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, num_workers=0)
+for epoch in range(50):
+    model.train()
+    for inputs, masks, labels in train_loader:
+        inputs, masks, labels = inputs.to(device), masks.to(device), labels.to(device)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = NeuralNet(input_size, hidden_size, output_size).to(device=device)
-
-# loss and optimizer 
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr= learning_rate)
-
-for epoch in range(num_epochs):
-    for (words, labels) in train_loader:
-        words = words.to(device)
-        labels = labels.to(device)
-        
-        #forward
-        outputs = model(words)
-        loss = criterion(outputs, labels)
-        
-        #backward and optimizer 
         optimizer.zero_grad()
+        outputs = model(input_ids=inputs, attention_mask=masks).logits
+        loss = criterion(outputs, labels)
+
         loss.backward()
         optimizer.step()
-        
-    if (epoch + 1) % 100 == 0: # for each 100 epoch we will print ==>
-       print(f"epoch {epoch + 1} / {num_epochs}, loss = {loss.item():.11f}")
-       
 
-data = {
-    "model_state": model.state_dict(),
-    "input_size": input_size,
-    "output_size": output_size,
-    "hidden_size": hidden_size,
-    "all_words": all_words,
-    "tags": tags
-}
+    print(f"Epoch {epoch+1}, Loss: {loss.item()}")
 
-FILE = "data.pth"
-torch.save(data,FILE)
-print('Training complete. file saved to {FILE}')
+# Save model
+torch.save(model.state_dict(), "chatbot_model.pth")
+print("Model trained and saved!")
