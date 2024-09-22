@@ -22,7 +22,7 @@ class IntentDataset(Dataset):
             padding = "max_length",
             truncation = True
         )
-        return encoding['input_idx'].squeeze(), encoding['attention_mask'].squeeze(), label
+        return encoding['input_ids'].squeeze(), encoding['attention_mask'].squeeze(), label
         """
         - encoding['input_ids']: The numerical representation of the tokenized input text
         - encoding['attention_mask']: A mask indicating which tokens should be attended to (1 for actual tokens, 0 for padding).
