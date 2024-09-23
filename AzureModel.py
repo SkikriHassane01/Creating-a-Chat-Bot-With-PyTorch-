@@ -1,4 +1,5 @@
 import requests
+
 from dotenv import load_dotenv
 import os 
 
@@ -8,6 +9,7 @@ def query_azure_openai(query):
     
     api_key =  os.getenv('API_KEY')
     endpoint = os.getenv('ENDPOINT')
+
 
     headers = {
         "Content-Type": "application/json",

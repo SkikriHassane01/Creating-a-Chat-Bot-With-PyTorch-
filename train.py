@@ -24,7 +24,9 @@ train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 optimizer = AdamW(model.parameters(), lr=5e-5)
 criterion = torch.nn.CrossEntropyLoss()
 
+
 for epoch in range(60):
+
     model.train()
     for inputs, masks, labels in train_loader:
         inputs, masks, labels = inputs.to(device), masks.to(device), labels.to(device)
